@@ -157,6 +157,24 @@ function encode(text)
 	return encoded_text
 }
 
+function decode(text)
+{
+	current_code = "";
+	decoded_text = "";
+
+	for(i=0;i<text.length;i++)
+	{
+		current_code += text[i];
+		if(current_code in dec_dict)
+		{
+			character = dec_dict[current_code];
+			decoded_text += character;
+			current_code = "";
+		}
+	}
+	return decoded_text;
+}
+
 function gerar()
 {
 	w=0
@@ -179,13 +197,15 @@ function gerar()
 
 function hist_prox()
 {
-	w++;
+	if(w<freq_history.length)
+		w++;
 	$("#hist_freq").text(freq_history[w]);
 	
 }
 function hist_ant()
 {
-	w--;
+	if(w>0)
+		w--;
 	$("#hist_freq").text(freq_history[w]);
 }
 
@@ -198,7 +218,8 @@ function show_code()
 
 function show_decode()
 {
-	
+	str = document.getElementById("plaintext").value;
+	$("#texto_saida").text(decode(str));
 }
 
 
