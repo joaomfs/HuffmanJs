@@ -87,7 +87,6 @@ function make_digraph_helper(root, list){
 	if (root.left != null)
 	{
 		list.push('"'+root.chr+' '+root.freq+'"' + ' -> ' + '"'+root.left.chr+' '+root.left.freq+'"' + ' [ label = 0];');
-		console.log(list);
 		make_digraph_helper(root.left, list);
 	}
 	if (root.right != null)
@@ -174,6 +173,11 @@ function gerar()
 	freq_history.push(freq_to_string(frequency.sort(compare)));
 	
 	$("#hist_freq").text(freq_history[w]);
+	$( "#graph" ).load(window.location.href + " #graph" );
+		d3.select("#graph").graphviz()
+		.zoom(false)
+	    .fade(false)
+	    .renderDot('digraph  {}');
 }
 
 function hist_prox()
