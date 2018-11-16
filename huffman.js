@@ -3,13 +3,17 @@ var enc_dict = {};
 var dec_dict = {};
 var frequency = [];
 var w=0;
+var p=0;
 var str;
+var done = false;
+var controle =0;
 function TreeNode(chr, freq)
 {
 	this.chr = chr;
 	this.freq = freq;
 	this.left = null;
 	this.right = null;
+	this.show = -1;
 }
 
 function insert(arr, node)
@@ -48,16 +52,21 @@ function compare(a,b) {
 function make_tree(frequency)
 {
 	frequency.sort(compare);
-	freq_history.push(freq_to_string(frequency));
-	while (frequency.length > 1)
+	
+	if (frequency.length > 1)
 	{
 		right = frequency.pop();
 		left = frequency.pop();
 		new_node = new TreeNode(left.chr + right.chr, left.freq + right.freq);
 		new_node.left = left;
 		new_node.right = right;
+		new_node.show = p++;
 		insert(frequency, new_node);
 		freq_history.push(freq_to_string(frequency));
+	}
+	if(frequency.length==1){
+		make_codes_helper(frequency[0], enc_dict, dec_dict, "");
+		done=true;
 	}
 }
 
@@ -77,12 +86,13 @@ function make_codes_helper(root, dict, revdict, current_code){
 function make_digraph_helper(root, list){
 	if (root.left != null)
 	{
-		list.push(root.chr + ' -> ' + root.left.chr + ' [ label = 0 ];');
+		list.push('"'+root.chr+' '+root.freq+'"' + ' -> ' + '"'+root.left.chr+' '+root.left.freq+'"' + ' [ label = 0];');
+		console.log(list);
 		make_digraph_helper(root.left, list);
 	}
 	if (root.right != null)
 	{
-		list.push(root.chr + ' -> ' + root.right.chr + ' [ label = 1 ];');
+		list.push('"'+root.chr+' '+root.freq+'"' + ' -> ' + '"'+root.right.chr+' '+root.right.freq+'"' + ' [ label = 1 ];');
 		make_digraph_helper(root.right, list);
 	}
 }
@@ -107,7 +117,12 @@ function make_frequency(str)
 function make_digraph(root)
 {
 	list = [];
-	make_digraph_helper(root, list);
+	for(i=0; i< root.length; i++){
+		if(root[i].show>=0){
+			
+			make_digraph_helper(root[i], list,i);
+		}
+	}
 	return list.join(' ');
 }
 
@@ -154,21 +169,25 @@ function gerar()
 	enc_dict = {};
 	dec_dict = {};
 	frequency = [];
-	var str = document.getElementById("plaintext").value;
+	var str = document.getElementById("plaintext").value.replace(/ /g,'');
 	frequency = make_frequency(str);
-	make_tree(frequency);
-	make_codes_helper(frequency[0], enc_dict, dec_dict, "");
-		for(i=0; i<freq_history.length;i++){
-		console.log(freq_history[i]);
-	}
-	d3.select("#graph").graphviz()
-    .fade(false)
-    .renderDot('digraph  {' + make_digraph(frequency[0]) + '}');
-    $("#hist_freq").text(freq_history[w]);
+	freq_history.push(freq_to_string(frequency.sort(compare)));
+	
+	$("#hist_freq").text(freq_history[w]);
 }
 
 function hist_prox()
 {
+	if(controle==0){
+		make_tree(frequency);
+		$( "#graph" ).load(window.location.href + " #graph" );
+		d3.select("#graph").graphviz()
+		.zoom(false)
+	    .fade(false)
+	    .renderDot('digraph  {' + make_digraph(frequency) + '}');
+	}else{
+		controle++;
+	}
 	if(w<freq_history.length)
 		w++;
 	$("#hist_freq").text(freq_history[w]);
@@ -176,21 +195,34 @@ function hist_prox()
 }
 function hist_ant()
 {
-	if(w>0)
+	if(w>0){
 		w--;
+		controle--;
+	}
 	$("#hist_freq").text(freq_history[w]);
 }
 
 function show_code()
 {
-	str = document.getElementById("plaintext").value;
-	$("#texto_saida").text(encode(str));
+	if(done){
+		str = document.getElementById("plaintext").value;
+		$("#texto_saida").text(encode(str));
+	}
+	else{
+		$("#texto_saida").text("finish developing the tree");
+	}
 
 }
 
 function show_decode()
 {
-	str = document.getElementById("plaintext").value;
-	$("#texto_saida").text(decode(str));
+	if(done){
+		str = document.getElementById("plaintext").value;
+		$("#texto_saida").text(decode(str));
+	}
+	else{
+		$("#texto_saida").text("finish developing the tree");
+	}
 }
+
 
