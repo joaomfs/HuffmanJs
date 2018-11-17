@@ -1,19 +1,17 @@
 var freq_history = [];
+var graph_history =[];
 var enc_dict = {};
 var dec_dict = {};
 var frequency = [];
 var w=0;
 var p=0;
-var str;
-var done = false;
-var controle =0;
 function TreeNode(chr, freq)
 {
 	this.chr = chr;
 	this.freq = freq;
 	this.left = null;
 	this.right = null;
-	this.show = -1;
+	this.show = false;
 }
 
 function insert(arr, node)
@@ -52,22 +50,20 @@ function compare(a,b) {
 function make_tree(frequency)
 {
 	frequency.sort(compare);
-	
-	if (frequency.length > 1)
+	freq_history.push(freq_to_string(frequency));
+	while (frequency.length > 1)
 	{
 		right = frequency.pop();
 		left = frequency.pop();
 		new_node = new TreeNode(left.chr + right.chr, left.freq + right.freq);
 		new_node.left = left;
 		new_node.right = right;
-		new_node.show = p++;
+		new_node.show = true;
 		insert(frequency, new_node);
 		freq_history.push(freq_to_string(frequency));
+		graph_history.push('digraph  {' + make_digraph(frequency) + '}');
 	}
-	if(frequency.length==1){
-		make_codes_helper(frequency[0], enc_dict, dec_dict, "");
-		done=true;
-	}
+	
 }
 
 function make_codes_helper(root, dict, revdict, current_code){
@@ -117,7 +113,7 @@ function make_digraph(root)
 {
 	list = [];
 	for(i=0; i< root.length; i++){
-		if(root[i].show>=0){
+		if(root[i].show){
 			
 			make_digraph_helper(root[i], list,i);
 		}
@@ -168,65 +164,57 @@ function gerar()
 	enc_dict = {};
 	dec_dict = {};
 	frequency = [];
+	graph_history = [];
 	var str = document.getElementById("plaintext").value.replace(/ /g,'');
 	frequency = make_frequency(str);
-	freq_history.push(freq_to_string(frequency.sort(compare)));
-	
+	graph_history.push('digraph  {}');
+	make_tree(frequency);
+	make_codes_helper(frequency[0], enc_dict, dec_dict, "");
 	$("#hist_freq").text(freq_history[w]);
 	$( "#graph" ).load(window.location.href + " #graph" );
 		d3.select("#graph").graphviz()
 		.zoom(false)
 	    .fade(false)
-	    .renderDot('digraph  {}');
+	    .renderDot(graph_history[w]);
 }
 
 function hist_prox()
 {
-	if(controle==0){
-		make_tree(frequency);
-		$( "#graph" ).load(window.location.href + " #graph" );
-		d3.select("#graph").graphviz()
-		.zoom(false)
-	    .fade(false)
-	    .renderDot('digraph  {' + make_digraph(frequency) + '}');
-	}else{
-		controle++;
-	}
-	if(w<freq_history.length)
+	if(w<freq_history.length-1){
 		w++;
+	}
+	console.log(w);
+	console.log(freq_history);
 	$("#hist_freq").text(freq_history[w]);
-	
+	d3.select("#graph").graphviz()
+	.zoom(false)
+    .fade(false)
+    .renderDot(graph_history[w]);
 }
 function hist_ant()
 {
 	if(w>0){
 		w--;
-		controle--;
 	}
 	$("#hist_freq").text(freq_history[w]);
+	make_tree(frequency);
+	$( "#graph" ).load(window.location.href + " #graph" );
+	d3.select("#graph").graphviz()
+	.zoom(false)
+    .fade(false)
+    .renderDot(graph_history[w]);
 }
 
 function show_code()
 {
-	if(done){
-		str = document.getElementById("plaintext").value;
-		$("#texto_saida").text(encode(str));
-	}
-	else{
-		$("#texto_saida").text("finish developing the tree");
-	}
-
+	str = document.getElementById("plaintext").value.replace(/ /g,'');
+	$("#texto_saida").text(encode(str));
 }
 
 function show_decode()
 {
-	if(done){
-		str = document.getElementById("plaintext").value;
-		$("#texto_saida").text(decode(str));
-	}
-	else{
-		$("#texto_saida").text("finish developing the tree");
-	}
+	str = document.getElementById("plaintext").value.replace(/ /g,'');
+	$("#texto_saida").text(decode(str));
 }
 
 
