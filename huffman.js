@@ -171,8 +171,7 @@ function gerar()
 	frequency = [];
 	graph_history = [];
 	$("#texto_saida").text("");
-	$('#cr').text("");
-	var str = document.getElementById("plaintext").value.replace(/ /g,'');
+	var str = document.getElementById("plaintext").value;
 	frequency = make_frequency(str);
 	graph_history.push('digraph  {}');
 	make_tree(frequency);
@@ -214,16 +213,14 @@ function hist_ant()
 
 function show_code()
 {
-	str = document.getElementById("plaintext").value.replace(/ /g,'');
-	$("#texto_saida").text(encode(str));
-	$("#cr").text("The compression ratio is: " + calculatecr(str, encode(str)));
+	str = document.getElementById("plaintext").value;
+	$("#texto_saida").text(encode(str) + "    and the compression ratio is: " + calculatecr(str, encode(str)));
 
 }
 
 function show_decode()
 {
-	str = document.getElementById("plaintext").value.replace(/ /g,'');
+	str = document.getElementById("plaintext").value;
 	$("#texto_saida").text(decode(str));
-	$('#cr').text("");
 }
 
