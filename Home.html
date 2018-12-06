@@ -1,5 +1,9 @@
 <!DOCTYPE html>
 <meta charset="utf-8">
+<html>
+<head>
+<h1>Huffman encoder/decoder</h1>	
+</head>
 <body>
 <script src="https://d3js.org/d3.v5.min.js"></script>
 <script src="https://unpkg.com/viz.js@1.8.0/viz.js" type="javascript/worker"></script>
@@ -13,6 +17,7 @@
  <button onclick="show_code() " style="display:block" >Code</button>
  <button onclick="show_decode()" style="display:block">Decode</button> <div id="texto_saida"></div>
 </div> 
+<div id="cr" title="assuming 8 bits per character"></div>
 <br>
 
  <button onclick="hist_ant()" >Prev</button>
@@ -22,3 +27,5 @@
 
 
 <script type="text/javascript" src="huffman.js"></script>
+</body>
+</html>

@@ -157,6 +157,11 @@ function decode(text)
 	return decoded_text;
 }
 
+function calculatecr(original_str, enc_str)
+{
+	return original_str.length*8 +":"+ enc_str.length + " (" + (original_str.length*8/enc_str.length).toFixed(2) + ")";
+}
+
 function gerar()
 {
 	w=0
@@ -165,6 +170,8 @@ function gerar()
 	dec_dict = {};
 	frequency = [];
 	graph_history = [];
+	$("#texto_saida").text("");
+	$('#cr').text("");
 	var str = document.getElementById("plaintext").value.replace(/ /g,'');
 	frequency = make_frequency(str);
 	graph_history.push('digraph  {}');
@@ -209,12 +216,14 @@ function show_code()
 {
 	str = document.getElementById("plaintext").value.replace(/ /g,'');
 	$("#texto_saida").text(encode(str));
+	$("#cr").text("The compression ratio is: " + calculatecr(str, encode(str)));
+
 }
 
 function show_decode()
 {
 	str = document.getElementById("plaintext").value.replace(/ /g,'');
 	$("#texto_saida").text(decode(str));
+	$('#cr').text("");
 }
-
 
